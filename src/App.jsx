@@ -18,7 +18,6 @@ function App() {
     const formattedName = playerName.trim().replace("#", "%23");
 
     try {
-      console.log(BUNGIE_API_KEY);
       const response = await fetch(
         `https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/1/${formattedName}/`,
         {
