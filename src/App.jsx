@@ -1,158 +1,80 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import SearchProfile from "./Pages/SearchProfile";
+import ProfileSelect from "./Pages/ProfileSelect";
+import CharacterSelect from "./Pages/CharacterSelect";
+
+//Whashi#9741
 
 function App() {
-  const BUNGIE_API_KEY = import.meta.env.VITE_BUNGIE_API_KEY;
-
-  const PLATFROMS = {
-    Xbox: 1,
-    PlayStation: 2,
-    Steam: 3,
-    EpicGames: 6,
-  };
+  const [playerName, setPlayerName] = useState("Whashi#9741");
+  const [playerProfiles, setPlayerProfiles] = useState([]);
+  const [characters, setCharacters] = useState();
 
   const [recentActivity, setRecentActivity] = useState();
 
-  const searchDestinyPlayer = async (playerName) => {
-    console.log("Searching for player:", playerName);
-
-    const formattedName = playerName.trim().replace("#", "%23");
-
-    try {
-      const response = await fetch(
-        `https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/1/${formattedName}/`,
-        {
-          headers: {
-            "X-API-Key": `${BUNGIE_API_KEY}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("API Error:", {
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-        });
-        throw new Error(`API Error: ${data.Message || "Unknown error"}`);
-      }
-      console.log("Search response:", data);
-
-      if (data.Response.length > 0) {
-        return {
-          membershipType: data.Response[0].membershipType,
-          membershipId: data.Response[0].membershipId,
-        };
-      } else {
-        console.log("Player not found");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error searching for player:", error);
-      throw error;
-    }
-  };
-
-  const getDestinyProfile = async (playerName) => {
-    const player = await searchDestinyPlayer(playerName);
-    if (player) {
-      const response = await fetch(
-        `https://www.bungie.net/Platform/Destiny2/${player.membershipType}/Profile/${player.membershipId}/?components=200`,
-        {
-          headers: {
-            "X-API-Key": BUNGIE_API_KEY,
-          },
-        }
-      );
-      const data = await response.json();
-      console.log(data);
-    }
-  };
-
-  // getDestinyProfile("Whashi#9741");
-
-  const getRecentActivities = async (playerName) => {
-    const player = await searchDestinyPlayer(playerName);
-    if (player) {
-      console.log(player);
-
-      const profileResponse = await fetch(
-        `https://www.bungie.net/Platform/Destiny2/${player.membershipType}/Profile/${player.membershipId}/?components=200`,
-        {
-          headers: {
-            "X-API-Key": BUNGIE_API_KEY,
-          },
-        }
-      );
-
-      const profileData = await profileResponse.json();
-      const characterId = Object.keys(profileData.Response.characters.data)[0];
-
-      const response = await fetch(
-        `https://www.bungie.net/Platform/Destiny2/${player.membershipType}/Account/${player.membershipId}/Character/${characterId}/Stats/Activities/?count=20`,
-        {
-          headers: {
-            "X-API-Key": BUNGIE_API_KEY,
-          },
-        }
-      );
-      const data = await response.json();
-      console.log(data);
-      setRecentActivity(data.Response.activities[0].activityDetails.instanceId);
-    }
-  };
-
-  useEffect(() => {
-    getRecentActivities("Whashi#9741");
-  }, []);
-
-  const getPostGameCarnageReport = async (activityId) => {
-    const response = await fetch(
-      `https://stats.bungie.net/Platform/Destiny2/Stats/PostGameCarnageReport/${activityId}/`,
-      {
-        method: "GET",
-        headers: {
-          "X-API-Key": BUNGIE_API_KEY,
-          "Content-Type": "application/json",
-          Origin: window.location.origin,
-        },
-      }
-    );
-    const data = await response.json();
-    console.log(data);
-    if (data.ErrorCode === 1) {
-      return data.Response;
-    } else {
-      console.error("Error fetching Post Game Carnage Report:", data);
-      throw new Error("Error fetching Post Game Carnage Report");
-    }
-  };
-
   return (
-    <>
-      <h1>I'm Add Clear</h1>
-      <button
-        onClick={() => {
-          getDestinyProfile("Whashi#9741");
+    <div
+      style={{
+        backgroundColor: "#282c34",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "white",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "2.5rem",
+          marginBottom: "20px",
+          textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)",
         }}
       >
-        Get Destiny Profile
-      </button>
-      <button
-        onClick={() => {
-          getRecentActivities("Whashi#9741");
+        I'm Add Clear
+      </h1>
+      <h2
+        style={{
+          fontSize: "2rem",
+          marginBottom: "20px",
+          textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)",
         }}
-      >
-        Get Recent Activities
-      </button>
-      <button
-        onClick={() => {
-          getPostGameCarnageReport(recentActivity);
-        }}
-      >
-        Get Post Game Carnage Report
-      </button>
-    </>
+      >{playerName}</h2>
+      <Routes>
+        <Route
+          path="/search"
+          element={
+            <SearchProfile
+              playerName={playerName}
+              setPlayerName={setPlayerName}
+              setPlayerProfiles={setPlayerProfiles}
+            />
+          }
+        />
+        <Route
+          path="/profiles/"
+          element={
+            <ProfileSelect
+              playerProfiles={playerProfiles}
+              setCharacters={setCharacters}
+            />
+          }
+        />
+        <Route
+          path="/characters/"
+          element={
+            <CharacterSelect
+              characters={characters}
+              setCharacters={setCharacters}
+            />
+          }
+        />
+        {/* Add more routes as needed */}
+        <Route path="/" element={<Navigate to="/search" />} />
+        <Route path="*" element={<h1>404: Page Not Found</h1>} />
+      </Routes>
+    </div>
   );
 }
 
