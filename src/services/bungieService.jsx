@@ -1,4 +1,9 @@
 const BUNGIE_API_KEY = import.meta.env.VITE_BUNGIE_API_KEY;
+if (!BUNGIE_API_KEY) {
+  throw new Error(
+    'BUNGIE_API_KEY is not defined. Make sure you have set VITE_BUNGIE_API_KEY in your environment variables.'
+  );
+}
 
 const BASE_URL = "https://www.bungie.net/Platform";
 
