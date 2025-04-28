@@ -1,5 +1,11 @@
 const BUNGIE_API_KEY = import.meta.env.VITE_BUNGIE_API_KEY;
 
+if (!BUNGIE_API_KEY) {
+  console.error(
+    "BUNGIE_API_KEY is not defined. Please set it in your environment variables."
+  );
+}
+
 const BASE_URL = "https://www.bungie.net/Platform";
 
 export const searchDestinyPlayer = async (name) => {
