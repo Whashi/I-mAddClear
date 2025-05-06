@@ -4,11 +4,12 @@ import react from "@vitejs/plugin-react";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  build: {
-    rollupOptions: {
-      onwarn(warning, warn) {
-        console.log("Environment variables:", process.env);
-        warn(warning);
+  server: {
+    proxy: {
+      "/bungie": {
+        target: "https://www.bungie.net/Platform",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/bungie/, ""),
       },
     },
   },

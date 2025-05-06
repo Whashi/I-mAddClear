@@ -8,7 +8,8 @@ if (!BUNGIE_API_KEY) {
 const BASE_URL = "https://www.bungie.net/Platform";
 
 export const searchDestinyPlayer = async (name) => {
-  console.log("Searching for player:", name);
+  
+  console.log("Searching for player:", name);  
   if (!BUNGIE_API_KEY) {
     console.error(
       "BUNGIE_API_KEY is not defined. Please set it in your environment variables."
@@ -23,6 +24,7 @@ export const searchDestinyPlayer = async (name) => {
       {
         headers: {
           "X-API-Key": `${BUNGIE_API_KEY}`,
+          
         },
       }
     );
